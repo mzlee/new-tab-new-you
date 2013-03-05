@@ -1,14 +1,17 @@
 body {
 	font-family: Helvetica, Arial, sans-serif;
 	font-size: 10pt;
+	margin: auto;
+	margin-top: 10em;
+	width: 40em;
 }
 
 /* General widget styles */
 
 .widget {
-	border: 3px solid black;
-	margin: 3px;
-	width: 500px;
+	border: 0.5em solid black;
+	margin: 1em;
+	width: 37em;
 }
 
 .widget h1 {
@@ -20,13 +23,13 @@ body {
 }
 
 .widgetContent {
-	margin: 3px;
+	margin: 0.5em;
 }
 
 /* Styles for specific widgets */
 
 #searchGoogleBox {
-	width: 200px;
+	width: 20em;
 }
 
 .goalAccomplished {
