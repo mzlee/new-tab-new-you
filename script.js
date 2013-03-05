@@ -14,7 +14,7 @@ $(document).ready(function() {
 	//initialize widgets from localStorage
 	loadSiteKeywords();
 	drawWeeklyGoalsList(viewingWeek);	
-	drawCarbsTracker();
+	drawWorkTracker();
 	
 	//set focus to search box
 	$("#searchGoogleBox").focus();
@@ -84,9 +84,9 @@ $(document).ready(function() {
 		}
 	}
 		
-	function drawCarbsTracker() {
-		//draw carbs chart
-		drawCarbsChart();
+	function drawWorkTracker() {
+		//draw work chart
+		drawWorkChart();
 		
 		var today = moment(); //for use in date picker controls
 		
@@ -118,7 +118,7 @@ $(document).ready(function() {
 	//* * * * * * * *DATA FUNCTIONS * * * * * * * * //
 	
 	function getLocalData(objName) {
-		//objNames so far include "siteKeywords", "carbs", and "weeklyGoals"
+		//objNames so far include "siteKeywords", "work", and "weeklyGoals"
 		if (localStorage[objName] == undefined) {
 			localStorage[objName] = "{}";
 		} else {
@@ -293,9 +293,9 @@ $(document).ready(function() {
 		drawWeeklyGoalsList(viewingWeek);
 	});
 	
-	//ADD NEW CARBS DATA
-	$("#newCarbsData").submit(function() {
-		var userInput = $("#carbsTextBox").attr("value");
+	//ADD NEW WORK DATA
+	$("#newWorkData").submit(function() {
+		var userInput = currentTime();
 		if (isNaN(parseInt(userInput))) {
 			alert("Must enter an integer.")
 			return
@@ -303,12 +303,10 @@ $(document).ready(function() {
 			var selectedDate = $("#month").attr("value") + "/" + $("#day").attr("value") + "/" + $("#year").attr("value");
 			//if entered date is real
 			if (moment(selectedDate).isValid()) {
-				//add date-carbs pair to localStorage
-				appendLocalData("carbs", [selectedDate, parseInt(userInput)]);
-									
-				//refresh #carbsChart with new data
-				drawCarbsChart();
-									
+				//add date-work pair to localStorage
+				appendLocalData("work", [selectedDate, parseInt(userInput)]);
+				//refresh #workChart with new data
+				drawWorkChart();
 			} else { //if entered date is NOT real...
 				alert("Must enter a valid date.");
 			}
@@ -319,39 +317,45 @@ $(document).ready(function() {
 	
 	//* * * * * * * * * * HELPERS * * * * * * * * * //
 	
-	function drawCarbsChart() {
-		var carbsDict = getLocalData("carbs");
+	function currentTime() {
+		var minutes = Math.floor(new Date().getTime() / (60 * 1000) - new Date().getTimezoneOffset());
+		var hours = Math.floor(minutes / 60) % 24;
+		var minutes = minutes % 60;
+		alert(hours + ":" + minutes);
+		return hours * 60 + minutes;
+	}
+
+	function drawWorkChart() {
+		var workDict = getLocalData("work");
 		
 		//Grab lifetime data; calculate average
-		var lifetimeAverage = calculateAverageOfValues(carbsDict);
+		var lifetimeAverage = calculateAverageOfValues(workDict);
 		
 		//Narrow data to last two weeks; calculate that average
-		var fortnightCarbsDict = {};
+		var fortnightWorkDict = {};
 		for (i=-14; i<1; i++) {
 			var date = moment().add("days",i).format("M/D/YYYY");
-			fortnightCarbsDict[date] = carbsDict[date];
+			fortnightWorkDict[date] = workDict[date];
 		}
-		var fortnightAverage = calculateAverageOfValues(fortnightCarbsDict);
+		var fortnightAverage = calculateAverageOfValues(fortnightWorkDict);
 		
 		//Draw line chart
-		drawLineChart($("#carbsChart"), fortnightCarbsDict);
+		drawLineChart($("#workChart"), fortnightWorkDict);
 		
 		//write averages
-		var c = $("#carbsChart")[0].getContext("2d");
+		var c = $("#workChart")[0].getContext("2d");
 		var yPos = 14;
 		c.font = "14px Helvetica, Arial, sans-serif";
 		c.fillStyle = "#666";
 		c.textAlign = "end";
-		var canvasWidth = $("#carbsChart").attr("width");
-		var canvasHeight = $("#carbsChart").attr("height");
-		c.fillText("2-WEEK", canvasWidth - 5, yPos);
-		c.fillText("LIFETIME", canvasWidth - 5, yPos+40);
+		var canvasWidth = $("#workChart").attr("width");
+		var canvasHeight = $("#workChart").attr("height");
+		var statsY = canvasWidth - 100;
+		c.fillText("2-WEEK", statsY, yPos);
+		c.fillText("LIFETIME", statsY, yPos+40);
 		c.font = "bold 21px Helvetica";
-		c.fillText(fortnightAverage,canvasWidth - 5, yPos+20);
-		c.fillText(lifetimeAverage, canvasWidth - 5, yPos+60);
-		
-		//empty carbs textbox
-		$("#carbsTextBox").attr("value", "");
+		c.fillText(toTime(fortnightAverage),statsY, yPos+20);
+		c.fillText(toTime(lifetimeAverage), statsY, yPos+60);
 	}
 	
 	function calculateAverageOfValues(dict) {
@@ -360,13 +364,13 @@ $(document).ready(function() {
 
 		//cycle through days
 		for (key in dict) {
-			//if a day has carbs entered for it...
+			//if a day has work entered for it...
 			if (dict[key] != undefined) {
 				total += dict[key];
 				count += 1;
 			}
 		}
-		//return average carbs per day over dict's timeframe
+		//return average work per day over dict's timeframe
 		return (total/count).toFixed(2);
 	}
 });

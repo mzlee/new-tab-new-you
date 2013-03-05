@@ -1,5 +1,14 @@
 //requires JQuery
 
+function toTime(i) {
+    var i = Math.floor(i);
+    var hour = Math.floor(i / 60) % 24;
+    var minute = i % 60;
+    h = hour < 10 ? " " + hour : "" + hour;
+    m = minute < 10 ? "0" + minute : "" + minute;
+    return h + ":" + m;
+}
+
 function drawLineChart(canvas, dataDict) {
 	//organize canvas
 	var canvasElement = canvas[0];
@@ -9,7 +18,7 @@ function drawLineChart(canvas, dataDict) {
 	//determine chart height and width
 	var canvasWidth = canvas.attr("width");
 	var canvasHeight = canvas.attr("height");
-	var leftMargin = 20;
+	var leftMargin = 30;
 	var bottomMargin = 15;	
 	var chartWidth = canvasWidth-leftMargin;
 	var chartHeight = canvasHeight - bottomMargin;
@@ -28,21 +37,23 @@ function drawLineChart(canvas, dataDict) {
 	}
 	
 	//determine upper bound of graph -- next multiple of 10 above maxVal
-	var upperBound = maxVal + 10-(maxVal%10);
-	
+	var upperBound = 24*60 > (maxVal+60-(maxVal % 60)) ? 24*60 : (maxVal+60-(maxVal % 60));
+	var lowerBound = 12 * 60;
+	var interval = upperBound - lowerBound;
+
 	//determine pixels per y-unit
-	var scaling = chartHeight/upperBound;
-	
-	
+	var scaling = chartHeight / interval;
+
 	//fill in guide lines
 	c.fillStyle = "gray";
 	c.textAlign = "start";
-	for (i=0; i<upperBound; i+=10) {
-		var y = chartHeight - scaling*i;
+	var tic = Math.floor(interval / 600) * 60; 
+	for (i = 0; i < interval; i += tic) {
+		var y = chartHeight - scaling * i;
 		c.dashedLine(leftMargin, y, canvasWidth, y, 3);
-		
+
 		//write vertical axis units
-		c.fillText(i.toString(),0,y);
+		c.fillText(toTime(i+lowerBound), 0, y);
 	}
 	
 	//fill in data points
@@ -50,7 +61,7 @@ function drawLineChart(canvas, dataDict) {
 	var yNew;
 	var xOld = NaN, yOld = NaN;
 	for (key in dataDict) {
-		yNew = chartHeight - dataDict[key]*scaling;
+		yNew = chartHeight - (dataDict[key]-lowerBound)*scaling;
 		
 		//draw line from old to new point if both exist
 		if (!isNaN(yNew) && !isNaN(yOld)) {
