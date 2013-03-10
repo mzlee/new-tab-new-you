@@ -292,10 +292,14 @@ $(document).ready(function() {
 		viewingWeek = moment(viewingWeek).add("days", 7).format("M/D/YYYY");
 		drawWeeklyGoalsList(viewingWeek);
 	});
-	
+
 	//ADD NEW WORK DATA
 	$("#newWorkData").submit(function() {
+		var adjustData = $("#adjustWorkButton").val().split(':');
 		var userInput = currentTime();
+		if (adjustData = (60*parseInt(adjustData[0]) + parseInt(adjustData[1]))) {
+		    userInput = adjustData;
+		}
 		if (isNaN(parseInt(userInput))) {
 			alert("Must enter an integer.")
 			return
@@ -321,7 +325,6 @@ $(document).ready(function() {
 		var minutes = Math.floor(new Date().getTime() / (60 * 1000) - new Date().getTimezoneOffset());
 		var hours = Math.floor(minutes / 60) % 24;
 		var minutes = minutes % 60;
-		alert(hours + ":" + minutes);
 		return hours * 60 + minutes;
 	}
 
