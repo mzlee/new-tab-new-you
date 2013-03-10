@@ -347,13 +347,13 @@ $(document).ready(function() {
 		
 		//write averages
 		var c = $("#workChart")[0].getContext("2d");
-		var yPos = 14;
+		var yPos = 120;
 		c.font = "14px Helvetica, Arial, sans-serif";
 		c.fillStyle = "#666";
 		c.textAlign = "end";
 		var canvasWidth = $("#workChart").attr("width");
 		var canvasHeight = $("#workChart").attr("height");
-		var statsY = canvasWidth - 100;
+		var statsY = canvasWidth - 5;
 		c.fillText("2-WEEK", statsY, yPos);
 		c.fillText("LIFETIME", statsY, yPos+40);
 		c.font = "bold 21px Helvetica";

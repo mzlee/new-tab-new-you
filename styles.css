@@ -3,7 +3,7 @@ body {
 	font-size: 10pt;
 	margin: auto;
 	margin-top: 10em;
-	width: 40em;
+	width: 33em;
 }
 
 /* General widget styles */
@@ -11,7 +11,7 @@ body {
 .widget {
 	border: 0.5em solid black;
 	margin: 1em;
-	width: 37em;
+	width: 31em;
 }
 
 .widget h1 {
